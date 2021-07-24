@@ -1,0 +1,394 @@
+\documentclass[10pt,a4paper]{article}
+\usepackage[utf8]{inputenc}\DeclareUnicodeCharacter{2212}{-}
+\usepackage{graphicx,wrapfig,lipsum}
+\usepackage[T1]{fontenc}
+\usepackage{float}
+\usepackage[polish]{babel}
+\usepackage{wrapfig} 
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{mathtools}
+\usepackage{lmodern}
+\usepackage{enumitem}
+\usepackage{lscape}
+\usepackage{url}
+\usepackage{longtable}
+\usepackage{mhchem}
+\usepackage{mathpazo}
+\usepackage{booktabs}
+\usepackage{pgf}
+\renewcommand{\figurename}{Rys.}
+\renewcommand{\tablename}{Tab.}
+
+\author{Wojciech Noskowiak}
+\title{Raport z ćwiczenia P2}
+\date{Czerwiec 2021}
+
+\usepackage{natbib}
+\usepackage{graphicx}
+
+\begin{document}
+
+\maketitle
+\tableofcontents
+
+\begin{abstract}
+    Zbadałem prędkość dryfu elektronów w zależności od natężenia przyłożonego pola elektrycznego. W celu jej uzyskania mierzyłem czas w którym elektrony przedryfowywały znany dystans w polu elektrycznym o określonym natężeniu. Przeanalizowałem uzyskane pomiary, a uzyskane wyniki przedstawiłem na wykresach do których dopasowałem odpowiednie krzywe. Podjołem też próbę obliczenia parametrów charakteryzujących dyfuzję elektronów, jednak zakończyła się ona niepowodzeniem
+\end{abstract}
+
+\newpage
+
+\addcontentsline{toc}{section}{Wstęp}
+\section*{Wstęp}
+Ćwiczenia wykonałem na w oparciu o polecenia z instrukcji \cite{instrukcja}, udostępnione opracowanie \cite{opracowanie} oraz materiały wskazane na stronie pracowni \cite{dyfuzja} \cite{detektory} wykorzystując udostępniony mi układ badawczy. Celem ćwiczenia było wyznaczenie prędkości dryfu elektronów w gazie $87\%Ar + 13\% CO_2$ oraz przeanalizowanie jej zależności od przyłożonego pola elektrycznego. Badaną wartość wyliczyłem na podstawie czasu jaki elektrony potrzebowały na przelot znanego dystansu dla różnych wartości natężenia pola elektrycznego w obszarze dryfu. Dane z układu zczytywałem za pomocą oscyloskopu cyfrowego połączonego z komputerem. Odczytane z oscyloskopu dane przeanalizowałem własnym programem napisanym w języku python. Uzyskane wyniki przedstawilem na wykresach do których dopasowałem funkcje.
+
+\section{Wprowadzenie teoretyczne}
+
+\subsection{Motywacja \cite{instrukcja}}
+
+We współczesnej fizyce cząstek elementarnych powszechnie wykorzystywane są detektory gazowe. Dla otrzymania informacji o przechodzących przez taki detektor cząstkach neizbędna jest znajomość prędkości dryfu w wykorzystywanym niego gazie. Układy monitorujące prędkość dryfu stanowią więc integralną część wielu detektorów. 
+
+\subsection{Pojęcia teoretyczne}
+
+\subsubsection{Dryf}
+
+Dryfem nazywamy powolne przemieszczanie się cząstek naładowanych ruchem postępowym \cite{opracowanie}. Pojawienie się w gazie dryfu implikuje występowanie w nim prądu $\vec{j}$ określonego wzorem\cite{dyfuzja}:
+
+\begin{equation*}
+    \vec{j} = \sum_{k}{e_k n_k \vec{v_k}}
+\end{equation*}
+
+Gdzie indeks $k$ określa rodzaj cząstki naładowanej, a:
+\begin{itemize}
+    \item $e_k$ - ładunek danego  rodzaju cząstek
+    \item $n_k$ - koncentracja danego rodzaju cząstek
+    \item $v_k$ - prędkość dryfu cząstek danego rodzaju
+\end{itemize}
+
+Dryf cząstek może być wywołany wieloma zjawiskami, jednak w tym doświadczeniu zajmowałem się badaniem dryfu wywołanego na skutek działania zewnętrznego pola elektrycznego. Kierunek takiego dryfu jest zgodny z liniami działającego pola, a jego prędkość jest wprost proporcjonalna do natężenia tego pola\cite{opracowanie}:
+
+\begin{equation*}
+    \vec{v} = \mu \vec{E}
+\end{equation*}
+
+Gdzie $\mu$ jest współczynnikiem proporcjonalności.
+
+\newpage
+
+\subsubsection{Dyfuzja}
+
+\begin{wrapfigure}{l}{6cm}
+    \centering
+    \includegraphics[width=6cm]{diagrams/dyfuzja.pdf}
+    \caption{Reprezentacja rozprzestrzeniania związanego z dyfuzją. W miarę upływu czasu sygnał staje się coraz bardziej rozmyty}
+    \label{dyfuzja}
+\end{wrapfigure}
+
+Dyfuzją nazywamy proces samorzutnego rozprzestrzeniania się cząstek na skutek ich nieustannych ruchów molekularno-kinetycznych. Pomimo tego że da się ją zaobserwować we wszystkich stanach skupienia substancji, najszybciej zachodzi ona w gazach. Tak więc zjawisko dyfuzji dotyczyło również badanych przeze mnie dryfujących w gazie elektronów. W przypadku dyfuzji w jednym wymiarze (wzdłuż osi poruszania się cząstek) rozmycie jest proporcjonalne do czasu dryfu cząstek.\ref{dyfuzja} Występowanie tego zjawiska wprowadza dodatkowo utrudnia wyznaczenie toru cząstki w detektorach gazowych, dla tego do uzyskania poprawnych wyników konieczna jest nie tylko znajomość prędkości dryfu elektronów w gazie wykorzystywanym przez detektor, ale i parametry charakteryzujące dyfuzję cząstek w ośrodku. Podczas badania dyfuzji określa się wartość nazywaną rozmyciem strumienia cząstek $\sigma$ \cite{dyfuzja}:
+
+\begin{equation*}
+    \sigma = \sqrt{2Dt}
+\end{equation*}
+
+Gdzie $t$ określa czas dryfu cząstek, a $D$ \cite{opracowanie}:
+
+\begin{equation*}
+    D = \frac{\vec{v}\lambda}{3}
+\end{equation*}
+
+Gdzie $\vec{v}$ określa średnią prędkość cząstek, a $\lambda$ jest stałą proporcjonalności.
+
+\subsection{Teoria działania wykorzystywanego detektora gazowego}
+
+\begin{wrapfigure}{r}{4cm}
+    \centering
+    \includegraphics[width=4cm]{diagrams/detektor.pdf}
+    \caption{schemat detektora gazowego}
+    \label{detektor}
+\end{wrapfigure}
+
+Używany przeze mnie układ doświadczalny wykorzystywał tak zwane liczniki proporcjonalne. Są one detetorami gazowymi zbudowanymi z wypełnionego gazem cylindra oraz umieszczonego w nim koncentrycznie drutu.\ref{detektor} Podczas działania detektora wewnętrznemu drutowi zostaje nadany dodatni potencjał, a otaczającej go rurze potencjał ujemny (w przypadku mojego układu zewnętrzna rura była po prostu uziemiona). Jeśli przez działający detektor przeleci naładowana cząstak o wystarczającej energii, czyli energii większej od energii jonizacji atomów ośrodka, to spowoduje ona jonizację gazu wypełniającego detektor. Powstałe w tym procesie elektrony zaczną dryfować w kierunku naładowanego dodatnio koncentrycznego drutu. Jeśli napięcie na drucie będzie wystarczająco wysokie by w jego okolicy mogło zajść zjawisko wzmocnnienia gazowego (zjawiska w którym elektrony poruszające sie w polu elektrycznym osiągają energie wystarczające do jonizacji gazu, skutecznie zwiększając liczbę poruszających się elektronów), to po dotarciu do niego elektrony będą w stanie wytworzyć ujemny impuls elektryczny. sygnał ten może zostać odczytany oscyloskopem.\cite{detektory}
+
+W doświadczeniu liczników proporcjonalne wykorzystywałem zarówno do detekcji cząstek $\alpha$ przelatujących przez komorę dryfową jak i do wykrywania wybitych przez nią elektronów
+
+\section{Układ doświadczalny}
+
+\subsection{Opis układu doświadczalnego}
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=12cm]{diagrams/uklad.pdf}
+    \caption{Schemat układu badawczego }
+    \label{schem}
+\end{figure}
+
+Wykorzystany przeze mnie układ doświadczalny składał się z trzech liczników propocjonalnych oraz dwóch źródeł cząstek alfa połączonych z wypełnioną gazem komorą dryfową\cite{instrukcja}. Dwa z detektorów (\#1 i \#2  na rysunku \ref{schem}) były ułożonoe po tej samej stronie komory prostopadle do dłuższego z jej boków. Po przeciwnej stronie komory na przeciw każdego z nich znajdowało się źródło cząstek alfa (na rysunku \ref{schem} zaznaczone czeroną literą $\alpha$). trzeci detektor ((na rysunku \ref{schem}) \#3) znajdował się na końcu komory dryfowej. W ściankach komory dryfowej znajdowały się metalowe paski połączone ze sobą darbinką oporową, której jeden z końców był podłączony do źródła napięcia dryfu.
+
+\subsection{Zasada działania układu doświadczalnego}
+
+W czasie przeprowadzania pomiarów drabinka oporowa była utrzymywana pod napięciem (napięciem dryfu). Powodowało to wystąpienie jednorodnego pola elektrycznego w komorze dryfowej. Źródła promieniowania będące częścią układu doświadczalengo ustawione były w taki sposób, że generowane przez nie cząski $\alpha$ leciały w stronę znajdującego się na przeciw niego detektora przelatując przy tym przez komorę dryfową. Pojawienie się w komorze poruszającej się cząsteczki naładowanej powodowało jonizację gazu wypełniającego komorę. W wyniku działającego na nie jednorodnego pola elektrycznego wybite elektrony zaczynały dryfowac w stronę detektora \#3. Po pewnym czasie dryfowania dociarały one do niego, powodując pojawienie się sygnału. Porównanie czasu detekcji cząstki alfa powodującej wybicie elektronu z czasem pojawienia się sygnału na \#3 pozwalało na określenie czasu dryfu elektronów pomiędzy detektorami. Jako że w komorze dryfowej na odcinku pomiędzy detektorami \#1 i \#2 występowało jednorodne pole elektryczne, a dystans pomiędzy detektorami był znany, to znajomość czasu dryfu elektronów pomiędzy tymi detektorami pozwalała wyznaczyć ich prędkość dryfu. Ten czas dało się uzyskać poprzez porównanie czas dryfu elektronów pomiędzy detektorami \#1 i \#3 z czasem dryfu między detektorami \#2 i \#3
+
+\subsection{Budowa układu doświadczalnego}
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=9cm]{diagrams/układ.jpg}
+    \caption{Zdjęcie układu badawczego \cite{opracowanie}}
+    \label{zdjacie}
+\end{figure}
+
+\begin{wrapfigure}{l}{4cm}
+    \centering
+    \includegraphics[width=4cm]{diagrams/schemat_budowy.pdf}
+    \caption{Reprezentacja układu badawczego}
+    \label{reytwitrewtrewtr}
+\end{wrapfigure}
+W wykorzystanym przeze mnie układzie komora dryfowa wraz z detektorami i źródłami cząstek zamontowana była w szczelnym, aluminowym cylindrze. był on połączony z oscyloskopem cyfrowym, zasilaczem oraz pudłem kontrolnym. Do cylindra doprowadzona była takrze butla zawierająca wykorzystywaną mieszaninę gazów, czyli $87\%Ar + 13\% CO_2$. W celu kompletnego wypełnienia komory dryfowej wyżej wspomniana mieszanka gazów przez godzinę przed włączeniem napięcia płyneła przez układ z szybkością 1 $Nl/h$. Przepływ gazu nie został wstrzymany na czas wykonywania pomiarów. Sygnały z drutów anodowych detektorów były wzmacniane przez liniowe wzmacniacze zasilane niskim napięciem z pudła kontrolnego. Wzmacniacze odwracały fazę, dla tego z ujemnego impulsu prądowego pojawiającego się na anodach detektorów powstawał dodatni sygnał napięciowy proporcjonalny do całkowitego ładunku lawiny elektronów Q. Wartości pola dryfu oraz napięcia na poszczególnych detektorach można było regulować przy pomocy potencjometrów znajdujących się na czołowej ścianie pudła kontrolnego. Źródłem promieniowania $\alpha$ w układzie był izotop $\ce{^{241}Am}$ generująca cząski o energii ok. $5 MeV$ \cite{instrukcja}
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=9cm]{diagrams/IMG_20210325_145922__01.jpg}
+    \caption{Zdjęcie pudła kontrolnego}
+    \label{zdjacie2}
+\end{figure}
+
+\section{Opis wykonanych pomiarów}
+
+\subsection{Metoda uzyskania pomiarów}
+
+Pomiary rozpoczołem od włączenia układu i ustawienia napięcia na detektorach kierując się wytycznymi z instrukcji:
+
+\begin{table}[h]
+    \centering
+    \caption{Napięcia na detektorach \cite{instrukcja}}
+    \label{napiecia}
+    \begin{tabular}{|l|l|}
+        \hline
+        Detektor \#1 & 1800 V \\ \hline
+        Detektor \#2 & 1800 V \\ \hline
+        Detektor \#3 & 2000 V \\ \hline
+    \end{tabular}
+\end{table}
+
+Na wyniki pomiarów mogła mieć wpływ temperatura i ciśnienie gazu w komorze dryfowej, więc w czasie przeprowadzania pomiarów monitorowałem zachowanie tych wartości. Po odpowiednim ustawieniu napięć podłączyłem kanał A oscyloskopu z detektorem \#1, a kanał B z detektorem \#3. Potem nastaiłem napięcie dryfu na $600 V$. Oscyloskop ustawiłem w taki sposób, by po wykryciu sygnału na kanale A (czyli sygnału świadczący o wykryciu cząstki $\alpha$) zapisywał on dane z obu kanałów z pewnego krótkiego czasu z przed pojawienia się sygnału, oraz dane z pewnego okresu po pojawieniu się sygnału. Czas zbierania danych po wykryciu syganłu ustawiłem w taki sposób, by zawierał się w nim sygnał z kanału B (czyli sygnał świadczący o wykryciu elektronów wybitych przez przelatującą cząstkę). Oscyloskop automatycznie zbierał i zapisywał dane. Po wykonaniu 20 powtórzeń zapisywałem uzyskane dane, zwiększałem napięcie dryfu o $100 V$ i powtarzałem pomiary. Po uzyskaniu wyników dla napięcia dryfu $3000 V$ przełączałem kanał A oscyloskopu do detektora \#2, napięcie dryfu nastawiałem z powrotem na $600 V$ i powtarzałem proces.
+
+\subsection{Charakterystyka uzyskanych pomiarów}
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=10cm]{diagrams/13_1800_png_19.png}
+    \caption{Przykładowe dane jednej serii pomiarowej}
+    \label{przykladowe}
+\end{figure}
+
+Sygnały pochodzące z detektorów \#1 i \#2 różniły się znacząco do sygnałów pochodzących z detektora \#3, co jest zachowaniem zgodnym z przewidywaniami. W porównaniu do sygnałów pochodzących z detektora \#3 sygnały z detektorów \#1 i \#2 miały wyższe natężenie i wygasały wolniej\ref{przykladowe}. Sygnały ze wszystkich detektorów objawialy się zwiększeniem napięcia na kanale do którego były podpięte. jest to również zachowanie zgodne z przewidywaniami i jest wynikiem charakterystyki pracy wykorzystywanych przez układ wzmacniaczy sygnału \cite{opracowanie}
+
+\section{Analiza uzyskanych danych}
+
+\subsection{opis wykorzystanej metody analizy danych}
+
+Analizowanie danych rozpoczołem od wyboru poprawnych serii pomiarowych. Sprowadzało się to do odrzucenia serii w których wartości napięcia na kanałach oscyloskopu wychodziły poza skalę.
+
+\begin{wrapfigure}{r}{6cm}
+    \centering
+    \includegraphics[width=6cm]{diagrams/analiza.pdf}
+    \caption{Reprezentacja przykładowego sygnału z zaznaczonymi wartościami pomocniczymi}
+    \label{pomoc}
+\end{wrapfigure}
+
+W celu uzyskania czasu dryfu elektronów na podstawie wyselekcjonowanych danych musiałem wyznaczyć moment wykrycia cząstki $\alpha$ oraz moment wykrycia elektronów, a następnie porównać ze sobą uzyskane wartości. W tym celu wyliczałem szereg wartości pomocniczych \ref{pomoc}.
+
+Analizę danych z kanału A oscyloskopu (czyli tych świadczących o wykryciu cząstki $\alpha$) zaczynałem od wyznaczenia maksymalnego osiągniętego na kanale napięcia.
+Potem analizujac dane dla pomiarów sprzed osiągnięcia maksimum ustalałem napięcie odniesienia. W celu jego wyznaczenia znajdowałem czas w którym wartosc napiecia na kanale A oscyloskopu osiągała 0.1 wartości maksymalnej, uzyskany wynik mnożyłem przez 0.75 po czym uśredniałem wartości napięcia dla czasów starszych od uzyskanej wartości. Po uzyskaniu napięcia odniesienia określałem napięcie implikuje detekcję, czyli takie które sygnał na kanale osiąga w momencie wykrycia cząstki. W tym celu uśredniałem maksymalną wartość napięcia z wyliczonym wcześniej napięciem odniesienia. Tą wartość nazywam dalej napięciem wykrycia
+
+Następnie z pośród pomiarów dla czasów z przed osiągnięcia maksymalnego napięcia wybierałem ten o wartości najbardziej zbliżonej do napięcia wykrycia. Następnie wybierałem poprzedzające go 3 punkty oraz trzy punkty występujące po nim. Jeśli najmłodszy z wybranych w ten sposób pomiarów nie zawierał się w zbiorze punktów starszych od pomiaru maksymalnego napięcia odrzycałem go. Podobnie gdy wartość najstarszego pomiaru okazywała się być zbyt bliska wartości napięcia odniesienia to nie uwzględniałem jej w dalszych obliczeniach. Do tak wybranych punktów dopasowywałem prostą:
+
+\begin{equation*}
+    V(t) = at + b
+\end{equation*}
+
+Wyznaczone przez dopasowanie wspołczynniki podstawiałem potem do odwróconego równania prostej, które pozwalało na określenie czasu wykrycia cząstki $t_{wyk}$:
+
+\begin{equation*}
+    t_{wyk} = \frac{V_{wyk}-b}{a}
+\end{equation*}
+
+Gdzie $V_{wyk}$ wcześniej wyliczonym napięciem wykrycia
+
+Czas wykrycia elektronów wyliczałem przeprowadzając analogiczny rachunek dla sygnału z kanału B. Analogiczny rachunek wykonywałem dla pomiarów młodszych od pomiaru dla którego występowało najwyższe napięcie na kanale w celu ustalenia czasu końca impulsu, z którego następnie wyliczałem czas trwania impulsu $t_{imp}$
+
+\begin{equation*}
+    t_{imp} = t_{wykrycia \: elektronów} - t_{konca \: impulsu}
+\end{equation*}
+
+Po przeanalizowaniu serii pomiarów wyżej opisaną metodą od uzyskanego czasu wykrycia elektronu odejmowałem czas wykrycia czastek $\alpha$. Uzyskiwałem w ten sposób czas dryfu elektronów pomiędzy detektorami dla danej serii. Tak wyliczone czasy uśredniłem dla wszystkich pomiarów wykonanych dla danego napięcia dryfu.
+
+\begin{equation*}
+    <t_{1/2-3}> = <t_{3} - t_{1/2}>
+\end{equation*}
+
+Taki rachunek przeprowadzałem dla wszystkich badanych napięć dryfu i konfiguracji podłączeń detektorów. Po uzyskaniu wyników uzyskane średnie czasy przelotu parowałem na podstawie odpowiadającego im napięcia dryfu, a następnie wyliczyłem na ich podstawie czas dryfu elektronów pomiędzy detektorami \#1 i \#2:
+
+\begin{equation*}
+    t_{12} = t_{13} - t_{23}
+\end{equation*}
+
+Na podstawie tego czasu byłem w stanie określić prędkość dryfu elektronów $v$ dla danego napięcia dryfu:
+
+\begin{equation*}
+    v = \frac{S}{t_{12}}
+\end{equation*}
+
+Gdzie $S$ jest odległoscią pomiędzy detektorem \#1 a detektorem \#2, i wynosi 4.6$[cm]$
+
+Jako błędy pomiaru czasów przelotu przyjołem odchylenia standardowe uzyskanych wartości. Niepewność prędkości wyznaczyłem wykozystując metodę różniczki zupełnej:
+
+\begin{equation*}
+    \Delta v = \frac{S }{t^2_{12}} \Delta t + \frac{\Delta S}{t_{12}}
+\end{equation*}
+
+Wyliczone czasy dryfu jaki i związane z nimi prędkości sparowałem z odpowiadającymi im warościami zredukowanego natężenia pola dryfu, czyli warości pola drydu dla danego pomiaru podzieloną przez ciśnienie gazu w czasie wykonywania pomiaru. Uzyskane punkty przedstawiłem na wykresach
+
+Do wyliczonych czasów przelotu $t_{12}$ dopasowałem krzywą:
+
+\begin{equation*}
+    t_{12} = t_0 + A_te^{-\frac{1}{B_t}\frac{E}{p}}
+\end{equation*}
+
+A do uzyskanych prędkości dopasowałem prostą
+
+\begin{equation*}
+    v_{12} = A_v \frac{E}{p} + B_v
+\end{equation*}
+
+Opisana powyżej metoda analizy danych nie jest perfekcyjnie dokładna, ale stanowi sposób wyznaczania dobrego przybliżenia prawdziwych czasów wykrycia
+
+Obliczenia wykonałem programem w pythonie
+
+\newpage
+
+\subsection{uzyskane wyniki}
+
+\begin{table}[h]
+    \centering
+    \caption{Uzyskane wyniki}
+    \label{wyniki}
+    \resizebox{\textwidth}{!}{%
+        \begin{tabular}{|l|l|l|l|l|}
+            \hline
+            potencjał $\left[\frac{E}{cm*hPa}\right]$ & czas przelotu $\left[\mu s\right]$ & delta $\left[\mu s\right]$ & prędkość przelotu $\left[\frac{cm}{\mu s}\right]$ & delta $\left[\frac{cm}{\mu s}\right]$ \\ \hline
+            0,459                                     & 16,13                              & 0,09                       & 0,285                                             & 0,002                                 \\ \hline
+            0,536                                     & 13,74                              & 0,08                       & 0,335                                             & 0,002                                 \\ \hline
+            0,613                                     & 12,01                              & 0,08                       & 0,383                                             & 0,003                                 \\ \hline
+            0,689                                     & 10,68                              & 0,06                       & 0,431                                             & 0,003                                 \\ \hline
+            0,766                                     & 9,55                               & 0,08                       & 0,482                                             & 0,004                                 \\ \hline
+            0,842                                     & 8,63                               & 0,04                       & 0,533                                             & 0,003                                 \\ \hline
+            0,919                                     & 7,89                               & 0,03                       & 0,583                                             & 0,002                                 \\ \hline
+            0,995                                     & 7,27                               & 0,05                       & 0,633                                             & 0,005                                 \\ \hline
+            1,072                                     & 6,68                               & 0,06                       & 0,689                                             & 0,007                                 \\ \hline
+            1,149                                     & 6,25                               & 0,08                       & 0,74                                              & 0,01                                  \\ \hline
+            1,225                                     & 5,77                               & 0,07                       & 0,80                                              & 0,01                                  \\ \hline
+            1,302                                     & 5,43                               & 0,06                       & 0,85                                              & 0,01                                  \\ \hline
+            1,378                                     & 5,08                               & 0,05                       & 0,91                                              & 0,01                                  \\ \hline
+            1,455                                     & 4,82                               & 0,05                       & 0,95                                              & 0,01                                  \\ \hline
+            1,531                                     & 4,57                               & 0,03                       & 1,01                                              & 0,01                                  \\ \hline
+            1,608                                     & 4,33                               & 0,04                       & 1,06                                              & 0,01                                  \\ \hline
+            1,685                                     & 4,10                               & 0,03                       & 1,12                                              & 0,01                                  \\ \hline
+            1,761                                     & 3,91                               & 0,02                       & 1,18                                              & 0,01                                  \\ \hline
+            1,838                                     & 3,70                               & 0,04                       & 1,24                                              & 0,01                                  \\ \hline
+            1,914                                     & 3,55                               & 0,05                       & 1,30                                              & 0,02                                  \\ \hline
+            1,991                                     & 3,38                               & 0,04                       & 1,36                                              & 0,01                                  \\ \hline
+            2,067                                     & 3,23                               & 0,03                       & 1,42                                              & 0,01                                  \\ \hline
+            2,144                                     & 3,03                               & 0,04                       & 1,52                                              & 0,02                                  \\ \hline
+            2,221                                     & 2,95                               & 0,03                       & 1,56                                              & 0,01                                  \\ \hline
+            2,297                                     & 2,86                               & 0,04                       & 1,61                                              & 0,02                                  \\ \hline
+        \end{tabular}%
+    }
+\end{table}
+
+\begin{figure}[h]
+    \centering
+    \resizebox{0.49\textwidth}{!}{\input{diagrams/Figure_3.pgf}}
+    \resizebox{0.49\textwidth}{!}{\input{diagrams/Figure_4.pgf}}
+    \caption{wyniki przedstawione na wykresach z doapsowanymi krzywymi}
+    \label{kal2}
+\end{figure}
+\newpage
+
+W wyniku dopasowania otrzymałem następujące wartości wspólczynników:
+
+\begin{gather*}
+    A_v =  0.703 \pm 0.006 \\
+    B_v = -0.053 \pm 0.007 \\
+    t_0 = 31 \pm 1 \\
+    A_t = 0.51 \pm 0.02 \\
+    B_t = 2.8 \pm 0.1 \\
+\end{gather*}
+
+W czasie przeprowadzania pomiarów zarówno temperatura jaki ciśnienie pozostawały stałe, i wynosiły:
+
+\begin{gather*}
+    T =  25.8 [C]\\
+    P = 1306 [hPa]
+\end{gather*}
+
+\newpage
+
+\subsection{dyskusja wyników i błędów pomiarowych}
+
+Uzyskane przeze mnie wyniki były zbliżone do wyników uzyskanych w opracowaniu \cite{opracowanie}. Tak jak zasugerowałem wcześniej prędkość dryfu elektronów okazała się być liniowo zależna od przyłożonego napięcia dryfu. Jako że dopasowana wartość współczynnika $B_v$ okazała się być mała, to można przyjąć że stała proporcjonalności $\mu$ wynosiła około $0.703 \pm 0.006$. Wartość R dopasowania prostej do uzyskanych prędkości wyniosą 0.998, a wartość R dopasowania krzywej do uzyskanych czasów przelotu wyniosła 0.97. Świadczy to o tym że dopasowane funkcje dobrze reprezentują uzyskane wyniki. \begin{wrapfigure}{r}{4cm}
+    \centering
+    \includegraphics[width=4cm]{diagrams/zjebany.png}
+    \caption{Przykład problematycznego pomiaru}
+    \label{blad}
+\end{wrapfigure} Wyliczone przeze mnie niepewności pomiarów były o dwa rzędy wielkości mniejsze od wartości do których się odnosiły, co silnie sugeruje że uzyskane przeze mnie wyniki można uznać za miarodajne. Jednak uzyskane przeze mnie czasy dryfu, a co za tym idzie wyliczone na ich podstawie prędkości dryfu, dla wysokich wartości napięć dryfu odstawały od reszty wyników. Te odchylenia mogły być spowodowane błędami systematycznymi związanymi ze sposobem określania czasu wykrycia cząstek. Wykorzystana przeze mnie metoda analizy danych pozwalała wyznaczyć tylko przybliżony czas wykrycia cząstki. Dla wysokich wartości napięcia dryfu do wykorzystywanego przez moją metodę zakresu czasów przypada mniejsza ilość pomiarów. Powoduje zmniejszenie jakości dopasowania. Negatywny wpływ na dokładność wyników miała również dyfuzja. Powoduje ona na rozmycie impulsów elektronów, a jej wpływ na wyniki pomiarów był zależny od napięcia dryfu (rozmycie sygnału jest proporcjonalne do czasu dryfu, który z kolei jest odwrotnie proporcjonalny do prędkości dryfu. Sama prędkość dryfu była proporcjonalna do przyłożonego napięcia dryfu). Na niedokładność wyników mogła też wpłynąć konieczność odrzucenia niektórych pomiarów dla wysokich wartości napięć dryfu. W celu uzyskania czasu wykrycia elektronów musiałem być w stanie wyznaczyć maksymalne napięcie na kanale. Jednak dla pomiarów dokonanych dla wysokich napięć dryfu (szczególnie dla pomiarów dokonanych dla detektorów \#2 i \#3) wartości napięcia na kanale B potrafiły wychodzić poza skalę oscyloskopu \ref{blad}. Uniemożliwiało to wyznaczenie maksymalnej wartości napięcia na kanale, w rezultacie zmuszając mnie do odrzucenia takiego pomiaru. Z tego powodu na uśrednione czasy dryfu dla wysokich napięć składają się dane z mniejszej liczby pomiarów, co mogło skutkować zmniejszeniem dokładności otrzymanych danych.
+
+Jako że w czasie przeprowadzania pomiarów ciśnienie i temperatura gazu pozostawały niezmienne, to uzyskane odstępstwa nie mogą być wytłumaczone wachaniami tych wartości
+
+\newpage
+
+\section{Nieudana próba wyznaczenia parametru $\lambda$ związanego z dyfuzją}
+
+Próbowałem przeanalizować dyfuzje deryfujących elektronów w gazie. Na podstawie uzyskanych przeze mnie danych byłem w stanie przybliżyć czas $t_{imp}$ jaki trwał impuls wykrywany przez detektor \#3. Jako że byłem w stanie wyliczyć prędkość z jaką poruszały się elektrony, to uzyskana w ten sposób wartość pozwalała na wyliczenie szerokości sygnału. Z kolei ta szerokość była bezpośrednio związana z parametrem $\lambda$ charakteryzującego dyfuzję
+
+\begin{gather*}
+    \sigma = v_{el} t_{imp}\\
+    \sigma = \sqrt{2Dt} = \sqrt{2*D*\frac{l}{v_{el}}} = \sqrt{2\frac{1}{3}l\lambda}\\
+    v_{el} t_{imp} = \sqrt{2Dt} = \sqrt{2D\frac{l}{v_{el}}} = \sqrt{2\frac{1}{3}l\lambda}\\
+    \lambda = \frac{3v^2_{ele}t^2_{imp}}{2l}
+\end{gather*}
+
+Gdzie $l$ jest dystansem przebytym przez elektrony
+
+\begin{figure*}[h]
+    \centering
+    \resizebox{0.9\textwidth}{!}{\input{diagrams/Figure_5.pgf}}
+    \caption{Pomarańczowa łamana reprezentuje wartości $\lambda$ uzyskane dla pomiarów między detektorami \#2 i \#3, a niebieska między detektorami \#1 a \#3}
+\end{figure*}
+
+\begin{table}[h]
+    \centering
+    \caption{Uśrednione wartości}
+    \label{tab:my-table}
+    \begin{tabular}{|l|l|}
+    \hline
+    lambda   13            & 0.016 \\ \hline
+    odchylenie standardowe & 0.003 \\ \hline
+    lambda 23              & 0.021 \\ \hline
+    odchylenie standardowe & 0.007 \\ \hline
+    \end{tabular}
+    \end{table}
+
+Okazało się jednak ze uzyskane przeze mnie wyniki nie zgadzały się z przewidywaniami. Analizując dane uzyskane dla pomiarów wykonanych dla detektorów \#2 i \#3 uzyskiwałem znacząco inne wyniki niż dla pomiarów wykonanych dla detektorów \#1 i \#3. Wyliczona wartość parametru $\lambda$ nie była również stała dla pomiarów wykonanych dla tych samych detektorów, ale dla różnych wartości napięcia dryfu. Wyliczone przeze mnie wartości $\lambda$ powinny być niezależne od tych parametrów. Na niepoprawność wyników znaczący wpływ mógł mieć błąd systematyczny związany z wykorzystaną przeze mnie metodą analizy danych.
+
+\section{Podsumowanie}
+
+Wyznaczona przeze mnie wartość $\mu$ wyniosła $0.703 \pm 0.006$. Otrzymany przeze mnie wynik okazał się być zgodny z przewidywaniami teoretycznymi oraz wynikami przedstawionymi w opracowaniu dostępnym na stronie pracowni \cite{opracowanie}. W czasie wykonywania pomiarów wykorzystywany przeze mnie układ badawczy zachowywał się zgodnie z przewidywaniami. Wyliczone przeze mnie błędy pomiarowe okazały się być na tyle małe, że korelujące z nimi dane uznałem za miarodajne. Pomimo pewnych odchyleń występujących dla wyższych napięć dryfu dopasowane przeze mnie funkcje okazały się być dobrą reprezentacją otrzymanych przeze mnie wyników. Próba wyznaczenia parametru $\lambda$ charakteryzującego dyfuzję zakończyła się niepowodzeniem najprawdopodobniej spowodowanym błędem systematycznym wykorzystywanej przeze mnie metody analizy danych
+
+\bibliographystyle{unsrt}
+\bibliography{References}
+
+
+\end{document}
+
+
